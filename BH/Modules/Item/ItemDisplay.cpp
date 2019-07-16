@@ -58,6 +58,7 @@ SkillReplace skills[] = {
 
 std::map<std::string, int> UnknownItemCodes;
 vector<pair<string, string>> rules;
+map<string, string> condition_group;
 vector<Rule*> RuleList;
 vector<Rule*> MapRuleList;
 vector<Rule*> IgnoreRuleList;
@@ -369,19 +370,39 @@ namespace ItemDisplay {
 			return;
 		}
 
-
-
 		item_display_initialized = true;
 		rules.clear();
 		item_name_cache.ResetCache();
 		map_action_cache.ResetCache();
+		condition_group.clear();
+		BH::config->ReadAssoc("ConditionGroup", condition_group);
+		// debug info
+		/* printf("read conditions %d\n", condition_group.size()); */
+
 		BH::config->ReadMapList("ItemDisplay", rules);
 		for (unsigned int i = 0; i < rules.size(); i++) {
 			string buf;
 			stringstream ss(rules[i].first);
 			vector<string> tokens;
 			while (ss >> buf) {
-				tokens.push_back(buf);
+				// check if buf matches any user idendified strings, and replace it if so
+				// todo: make config groups nestable?
+				// the group token has to be surrounded by whitespace
+				if (condition_group.count(buf)) {
+					/* printf("found the key '%s'\n", buf); */
+					/* cout << "found the key: " << buf << endl; //'%s'\n", buf); */
+
+					string buf2;
+					stringstream ssg(condition_group[buf]);
+
+					while (ssg >> buf2) {
+						tokens.push_back(buf2);
+						/* cout << "adding: " << buf2 << endl; */
+					}
+				}
+				else {
+					tokens.push_back(buf);
+				}
 			}
 
 			LastConditionType = CT_None;

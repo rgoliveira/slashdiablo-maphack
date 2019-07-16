@@ -624,6 +624,7 @@ extern vector<Rule*> IgnoreRuleList;
 extern vector<pair<string, string>> rules;
 extern ItemNameLookupCache item_name_cache;
 extern MapActionLookupCache map_action_cache;
+extern map<string, string> condition_group;
 
 namespace ItemDisplay {
 	void InitializeItemRules();
