@@ -38,3 +38,6 @@ Release/*
 /.vs/*
 /BH.VC.db
 /out/*
+
+# vscode
+.vs/
