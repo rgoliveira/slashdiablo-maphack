@@ -512,14 +512,24 @@ void Maphack::OnAutomapDraw() {
 
 					xPos = unit->pPath->xPos;
 					yPos = unit->pPath->yPos;
-					automapBuffer.push([immunityText, enchantText, color, xPos, yPos, lineColor, MyPos]()->void{
+					automapBuffer.push([immunityText, enchantText, color, xPos, yPos, lineColor, MyPos, unit]()->void{
 						POINT automapLoc;
 						Drawing::Hook::ScreenToAutomap(&automapLoc, xPos, yPos);
 						if (immunityText.length() > 0)
 							Drawing::Texthook::Draw(automapLoc.x, automapLoc.y - 8, Drawing::Center, 6, White, immunityText);
 						if (enchantText.length() > 0)
 							Drawing::Texthook::Draw(automapLoc.x, automapLoc.y - 14, Drawing::Center, 6, White, enchantText);
-						Drawing::Crosshook::Draw(automapLoc.x, automapLoc.y, color);
+
+						// important monsters will show as crosses, others as little boxes
+						bool monsterShownAsCross = unit->pMonsterData->fSuperUniq ||
+							unit->pMonsterData->fBoss ||
+							unit->pMonsterData->fChamp;
+						if (monsterShownAsCross) {
+							Drawing::Crosshook::Draw(automapLoc.x, automapLoc.y, color);
+						} else {
+							Drawing::Boxhook::Draw(automapLoc.x - 1, automapLoc.y - 1, 2, 2, color, Drawing::BTNormal);
+						}
+
 						if (lineColor != -1) {
 							Drawing::Linehook::Draw(MyPos.x, MyPos.y, automapLoc.x, automapLoc.y, lineColor);
 						}
